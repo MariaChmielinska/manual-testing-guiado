@@ -1,3 +1,5 @@
+const { now } = require("mongoose");
+
 const coupons = [
     {
         code: "HOTEL2024",
@@ -129,11 +131,35 @@ const coupons = [
  * 2. No ha sido canjeado con anterioridad
  * 3. No está caducado 
  * 
- * @param {string} coupon Cupón a comprobar
+ * @param {string} code Cupón a comprobar
  * @returns {bool} true | false 
+ *
  */
+/* FIND ARRAY METHOD
 const isValidCoupon = (code) => {
-    // TODO
-}
+    //find code in the array which is identical to the code passed as a parameter
+    let coupon = coupons.find(coupon => coupon.code === code);
+
+    if (coupon) {
+        if(coupon.redeemed || coupon.expirationDate < Date.now()){
+            return false;
+        }
+        return true;
+    }
+
+return false;
+    // Verificamos si el cupón está canjeado o caducado
+    //return !coupon.redeemed && coupon.expirationDate > Date.now();
+};
+*/
+
+    //METHOD SOME
+    const isValidCoupon = (code) => {
+        return coupons.some((coupon) => coupon.code == code && !coupon.redeemed && new Date() < new Date(coupon.expirationDate));
+    };
 
 console.log("Cupón que existe, no está caducado y es válido. Debería devolver true", isValidCoupon('HOTEL2024'));
+console.log("Cupón que existe, no está caducado y es válido. Debería devolver true", isValidCoupon('DIVING2024'));
+console.log("Cupón que no exista en base de datos. Debería devolver false", isValidCoupon('HUGO2024'));
+console.log("Cupón que existe, no está caducado pero es canjeado. Debería devolver false", isValidCoupon('MUSIC2024'));
+console.log("Cupón que existe, está caducado y no es canjeado. Debería devolver true", isValidCoupon('ESCAPEROOM2024'));
